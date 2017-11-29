@@ -43,6 +43,14 @@ app.post('/', (req, res) => {
         console.log(err);
       } else {
         console.dir(responseData);
+        // Get data from responseData
+        const data = {
+          id: responseData.messages[0]['message.id'],
+          number: responseData.messages[0]['to']
+        }
+
+        // Emit to the client
+        io.emit('smsStatus', data);
       }
     }
   );
@@ -54,3 +62,12 @@ const port = 3000;
 
 // Start server
 const server = app.listen(port, () => console.log(`Server started on port ${port}`));
+
+// Connect to socket.io
+const io = socketio(server);
+io.on('connection', (socket) => {
+  console.log('Connected');
+  io.on('disconnect', () => {
+    console.log('Disconnected')
+  })
+})
